@@ -1,11 +1,21 @@
-if [[ $1 == "rapsn" ]]; then
-    RUNTIME=podman ./util/docker_build.sh crkbd:rapsn:flash
-    exit
+set -e
+
+gum() {
+    nix run nixpkgs#gum -- "$@"
+}
+qmk() {
+    nix run nixpkgs#qmk -- "$@"
+}
+
+gum style --foreground 82 --align left 'Flashing the Corne 🌩️'
+KEYBOARD=$(echo -e "rapsn\nrapsn-led" | gum choose)
+
+if gum confirm "flash from download json?"; then
+    QMK_JSON=$(find ~/Downloads -name "*.json" | gum choose)
+    qmk json2c "$QMK_JSON" -o ./keyboards/crkbd/keymaps/"$KEYBOARD"/keymap.c
+    rm "$QMK_JSON"
 fi
 
-if [[ $1 == "rapsn-led" ]]; then
-    RUNTIME=podman ./util/docker_build.sh crkbd:rapsn:flash
-    exit
-fi
-
-echo "specify a valid keymap"
+qmk clean
+qmk flash -kb crkbd -km "$KEYBOARD"
+qmk flash -kb crkbd -km "$KEYBOARD"
