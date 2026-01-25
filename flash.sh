@@ -12,8 +12,9 @@ KEYBOARD=$(echo -e "rapsn\nrapsn-led" | gum choose)
 
 if gum confirm "flash from download json?"; then
     QMK_JSON=$(find ~/Downloads -name "*.json" | gum choose)
-    qmk json2c "$QMK_JSON" -o ./keyboards/crkbd/keymaps/"$KEYBOARD"/keymap.c
-    rm "$QMK_JSON"
+    mv rapsn.json rapsn.json.BAK
+    mv "$QMK_JSON" rapsn.json
+    qmk json2c rapsn.json -o ./keyboards/crkbd/keymaps/"$KEYBOARD"/keymap.c
 fi
 
 qmk clean
